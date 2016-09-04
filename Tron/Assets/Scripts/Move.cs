@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Move : MonoBehaviour
 {
@@ -70,5 +71,14 @@ public class Move : MonoBehaviour
             co.transform.localScale = new Vector2(dist + 1, 1);
         else
             co.transform.localScale = new Vector2(1, dist + 1);
+    }
+
+    void OnTriggerEnter2D(Collider2D col)
+    {
+        if(col != wallCollider)
+        {
+            // DEATH
+            Destroy(this.gameObject);
+        }
     }
 }
