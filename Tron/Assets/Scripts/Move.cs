@@ -14,11 +14,21 @@ public class Move : MonoBehaviour
     private Collider2D wallCollider;
     private Vector2 lastWallPos;
 
+    public GameObject ParticlePrefab;
+
+    public Color playerColor;
+
+    private List<GameObject> walls;
+
+    private bool isDead = false;
+
     // Use this for initialization
     void Start()
     {
         rb2d = this.gameObject.GetComponent<Rigidbody2D>();
         rb2d.velocity = Vector2.up * speed;
+
+        walls = new List<GameObject>();
 
         SpawnWall();
     }
@@ -26,6 +36,7 @@ public class Move : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         if (Input.GetKeyDown(upKey) && rb2d.velocity.y == 0)
         {
             rb2d.velocity = Vector2.up * speed;
@@ -57,13 +68,15 @@ public class Move : MonoBehaviour
 
         // Spawn a new Lightwall
         GameObject g = (GameObject)Instantiate(wallPrefab, transform.position, Quaternion.identity);
+        g.GetComponent<SpriteRenderer>().color = playerColor;
         wallCollider = g.GetComponent<Collider2D>();
+        walls.Add(g);
     }
 
     void FitColliderBetween(Collider2D co, Vector2 a, Vector2 b)
     {
         // Calculate the Center Position
-        co.transform.position = a + (b - a)*0.5f;
+        co.transform.position = a + (b - a) * 0.5f;
 
         // Scale it (horizontally or vertically)
         float dist = Vector2.Distance(a, b);
@@ -75,10 +88,49 @@ public class Move : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if(col != wallCollider)
+        if (col != wallCollider)
         {
-            // DEATH
+            //StartCoroutine(Crash());
             Destroy(this.gameObject);
         }
     }
+
+    void OnDestroy()
+    {
+        SpawnParticles(transform.position);
+        for(int i = 0; i < walls.Count; ++i)
+        {
+            Destroy(walls[i]);
+        }
+    }
+
+    void SpawnParticles(Vector3 pos)
+    {
+        GameObject g = Instantiate(ParticlePrefab, pos, Quaternion.identity) as GameObject;
+        g.GetComponent<ParticleSystem>().startColor = gameObject.GetComponent<SpriteRenderer>().color;
+    }
+
+    /*  IEnumerator Crash()
+      {
+          isDead = true;
+          rb2d.velocity = Vector2.zero;
+
+          // for(int i = walls.Count-1; i > 0; i--)
+          for (int i = 0; i < walls.Count; ++i)
+          {
+              DestroyWall(walls[i]);
+              walls.RemoveAt(i);
+              yield return new WaitForSeconds(0.05f);
+          }
+
+          SpawnParticles(transform.position);
+          Destroy(this.gameObject);
+      }
+
+      void DestroyWall(GameObject wall)
+      {
+          SpawnParticles(wall.transform.position);
+          wall.GetComponent<Collider2D>().enabled = false;
+          Destroy(wall);
+      } */
 }
