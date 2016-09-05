@@ -26,9 +26,7 @@ public class Move : MonoBehaviour
     void Start()
     {
         rb2d = this.gameObject.GetComponent<Rigidbody2D>();
-
         walls = new List<GameObject>();
-
         SpawnWall();
 
         hasStarted = false;
@@ -119,6 +117,7 @@ public class Move : MonoBehaviour
     }
     public void StopGame()
     {
+        rb2d.velocity = Vector2.zero;
         hasStarted = false;
     }
 }
