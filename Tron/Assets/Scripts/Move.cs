@@ -117,4 +117,8 @@ public class Move : MonoBehaviour
         rb2d.velocity = Vector2.up * speed;
         hasStarted = true;
     }
+    public void StopGame()
+    {
+        hasStarted = false;
+    }
 }
