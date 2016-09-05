@@ -20,45 +20,48 @@ public class Move : MonoBehaviour
 
     private List<GameObject> walls;
 
-    private bool isDead = false;
+    private bool hasStarted;
 
     // Use this for initialization
     void Start()
     {
         rb2d = this.gameObject.GetComponent<Rigidbody2D>();
-        rb2d.velocity = Vector2.up * speed;
 
         walls = new List<GameObject>();
 
         SpawnWall();
+
+        hasStarted = false;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (hasStarted)
+        {
+            if (Input.GetKeyDown(upKey) && rb2d.velocity.y == 0)
+            {
+                rb2d.velocity = Vector2.up * speed;
+                SpawnWall();
+            }
+            else if (Input.GetKeyDown(downKey) && rb2d.velocity.y == 0)
+            {
+                rb2d.velocity = Vector2.down * speed;
+                SpawnWall();
+            }
+            else if (Input.GetKeyDown(leftKey) && rb2d.velocity.x == 0)
+            {
+                rb2d.velocity = Vector2.left * speed;
+                SpawnWall();
+            }
+            else if (Input.GetKeyDown(rightKey) && rb2d.velocity.x == 0)
+            {
+                rb2d.velocity = Vector2.right * speed;
+                SpawnWall();
+            }
 
-        if (Input.GetKeyDown(upKey) && rb2d.velocity.y == 0)
-        {
-            rb2d.velocity = Vector2.up * speed;
-            SpawnWall();
+            FitColliderBetween(wallCollider, lastWallPos, transform.position);
         }
-        else if (Input.GetKeyDown(downKey) && rb2d.velocity.y == 0)
-        {
-            rb2d.velocity = Vector2.down * speed;
-            SpawnWall();
-        }
-        else if (Input.GetKeyDown(leftKey) && rb2d.velocity.x == 0)
-        {
-            rb2d.velocity = Vector2.left * speed;
-            SpawnWall();
-        }
-        else if (Input.GetKeyDown(rightKey) && rb2d.velocity.x == 0)
-        {
-            rb2d.velocity = Vector2.right * speed;
-            SpawnWall();
-        }
-
-        FitColliderBetween(wallCollider, lastWallPos, transform.position);
     }
 
     void SpawnWall()
@@ -90,7 +93,6 @@ public class Move : MonoBehaviour
     {
         if (col != wallCollider)
         {
-            //StartCoroutine(Crash());
             Destroy(this.gameObject);
         }
     }
@@ -98,7 +100,7 @@ public class Move : MonoBehaviour
     void OnDestroy()
     {
         SpawnParticles(transform.position);
-        for(int i = 0; i < walls.Count; ++i)
+        for (int i = 0; i < walls.Count; ++i)
         {
             Destroy(walls[i]);
         }
@@ -110,27 +112,9 @@ public class Move : MonoBehaviour
         g.GetComponent<ParticleSystem>().startColor = gameObject.GetComponent<SpriteRenderer>().color;
     }
 
-    /*  IEnumerator Crash()
-      {
-          isDead = true;
-          rb2d.velocity = Vector2.zero;
-
-          // for(int i = walls.Count-1; i > 0; i--)
-          for (int i = 0; i < walls.Count; ++i)
-          {
-              DestroyWall(walls[i]);
-              walls.RemoveAt(i);
-              yield return new WaitForSeconds(0.05f);
-          }
-
-          SpawnParticles(transform.position);
-          Destroy(this.gameObject);
-      }
-
-      void DestroyWall(GameObject wall)
-      {
-          SpawnParticles(wall.transform.position);
-          wall.GetComponent<Collider2D>().enabled = false;
-          Destroy(wall);
-      } */
+    public void StartGame()
+    {
+        rb2d.velocity = Vector2.up * speed;
+        hasStarted = true;
+    }
 }
